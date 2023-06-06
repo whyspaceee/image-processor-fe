@@ -2,27 +2,20 @@ import { useMutation } from "react-query";
 import { redirect, useNavigate } from "react-router-dom";
 
 export default function useUpload(
-  authTokens: {},
-  setAuthTokens: (tokens: {}) => void
 ) {
-
-  const navigate = useNavigate()
-
+  const navigate = useNavigate();
   const mutation = useMutation(
     "uploadToS3",
     async (file: File) => {
-      const { url, key, token } = await getPresignedUrl(file);
-      await uploadToS3({ file, presignedUrl: url, key });
-      return { key, url, token };
+      return{
+        token: "token",
+        key: "key"
+      }
     },
     {
       onSuccess: ({ token, key }) => {
-        setAuthTokens({
-          ...authTokens,
-          key: token,
-        });
         localStorage.setItem(key,token); 
-        navigate(`/edit/${key}`);
+        navigate("/edit");
       },
       onError: (error) => {
         console.log("er");
