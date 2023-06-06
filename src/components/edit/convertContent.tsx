@@ -17,9 +17,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { format } from "sharp";
 import { useEffect, useState } from "react";
 import { Label } from "../ui/label";
+import useConvert from "../../hooks/useConvert";
+import Spinner from "../ui/spinner";
+import { useParams } from "react-router-dom";
 
 const formats = [
   "heif",
@@ -36,6 +38,8 @@ const formats = [
 
 export default function ConvertContent() {
   const [format, setFormat] = useState("jpeg");
+  const { mutate, isLoading } = useConvert();
+  const { key } = useParams();
 
   return (
     <Card>
@@ -44,29 +48,43 @@ export default function ConvertContent() {
         <CardDescription>Convert your image</CardDescription>
       </CardHeader>
       <CardContent className="space-y-2">
-        <Label>Format</Label>
-        <Select onValueChange={(value) => setFormat(value)} defaultValue={format}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select a format" />
-          </SelectTrigger>
-          <SelectContent >
-            <ScrollArea className="max-h-[240px] ">
-              <SelectGroup>
-                <SelectLabel>Format</SelectLabel>
-                {formats.map((format: string) => (
-                  <SelectItem value={format} key={format}>{format}</SelectItem>
-                ))}
-              </SelectGroup>
-            </ScrollArea>
-          </SelectContent>
-        </Select>
+        {isLoading ? (
+          <Spinner />
+        ) : (
+          <>
+            <Label>Format</Label>
+            <Select
+              onValueChange={(value) => setFormat(value)}
+              defaultValue={format}
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Select a format" />
+              </SelectTrigger>
+              <SelectContent>
+                <ScrollArea className="max-h-[240px] ">
+                  <SelectGroup>
+                    <SelectLabel>Format</SelectLabel>
+                    {formats.map((format: string) => (
+                      <SelectItem value={format} key={format}>
+                        {format}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </ScrollArea>
+              </SelectContent>
+            </Select>
+          </>
+        )}
       </CardContent>
       <CardFooter>
-        <Button onClick={
-            () => {
-                console.log(format)
-            }
-        }>Convert</Button>
+        <Button
+          onClick={() => {
+            if (!key) return;
+            mutate({ format, key });
+          }}
+        >
+          Convert
+        </Button>
       </CardFooter>
     </Card>
   );

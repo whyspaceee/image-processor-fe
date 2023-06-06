@@ -15,8 +15,23 @@ const router = createBrowserRouter([
     element: <UploadPage />,
   },
   {
-    path: "/edit",
+    path: "/:key/edit",
     element: <EditPage />,
+    loader: async ({ params }) => {
+      if(!params.key) throw new Error("No key provided");
+      const baseUrl = import.meta.env.VITE_API_BASE_URL;
+      console.log(`${baseUrl}/edit/${params.key}`)
+      const response = await fetch(`${baseUrl}/edit/${params.key}`
+      ,{
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem(params.key)}`
+        },
+      });
+      const data = await response.json();
+      return data;
+    }
   }
 
 ]);

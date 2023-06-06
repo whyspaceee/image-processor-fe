@@ -17,14 +17,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { format } from "sharp";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Label } from "../ui/label";
 import { Slider } from "../ui/slider";
 import ReactCrop, { type Crop } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
+import useCrop from "../../hooks/useCrop";
+import { useParams } from "react-router-dom";
 
-export default function CropContent() {
+export default function CropContent({ url }: { url: string }) {
+  const cropMutation = useCrop();
+  const { key } = useParams();
+  const imgRef = useRef<HTMLImageElement | null>(null);
+
   const [crop, setCrop] = useState<Crop>();
   return (
     <Card>
@@ -33,16 +38,30 @@ export default function CropContent() {
         <CardDescription>Crop your image</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <ReactCrop crop={crop} onChange={(c) => setCrop(c)}>
-          <img src="https://images.unsplash.com/photo-1550321989-65d089904d5c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=764&q=80" />
+        <ReactCrop
+          crop={crop}
+          onChange={(crop, percentageCrop) => setCrop(percentageCrop)}
+          className=" w-full relative"
+        >
+          <img ref={imgRef} src={url} className=" w-full relative" />
         </ReactCrop>
-
-
       </CardContent>
       <CardFooter>
         <Button
           onClick={() => {
-            console.log(crop);
+            if (
+              crop &&
+              key &&
+              imgRef.current?.naturalHeight &&
+              imgRef.current?.naturalWidth
+            ) {
+              cropMutation.mutate({
+                key,
+                crop,
+                naturalHeight: imgRef.current?.naturalHeight,
+                naturalWidth: imgRef.current?.naturalWidth,
+              });
+            }
           }}
         >
           Crop
