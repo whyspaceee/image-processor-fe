@@ -28,7 +28,6 @@ import useCompress from "../../hooks/useCompress";
 const formats = [
   "heif",
   "jpeg",
-  "jpg",
   "jp2",
   "jxl",
   "pdf",

@@ -26,7 +26,6 @@ import { useParams } from "react-router-dom";
 const formats = [
   "heif",
   "jpeg",
-  "jpg",
   "jp2",
   "jxl",
   "pdf",
